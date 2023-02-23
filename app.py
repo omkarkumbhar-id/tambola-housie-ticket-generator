@@ -5,7 +5,7 @@ import operator
 with open('questions.json', 'r') as file:
     questions = json.load(file)
 
-number_of_tickets_to_generate = 500
+number_of_tickets_to_generate = 1000
 questions_per_ticket = 5
 required_filled_positions = 15
 rows = 3
@@ -55,6 +55,17 @@ def generate_ticket(all_questions):
                     print(f"ticket had a row with more or less number of filled postions than expected. Recreating the ticket\n{ticket}\n")
                     five_in_a_row = False
         if non_zero_ticket == True and five_in_a_row == True:
+            for i in range(0,columns):
+                column_numbers = []
+                for j in range(0,rows):
+                    number = ticket[j][i]
+                    if type(number) == type(91) and number != 0:
+                        column_numbers.append(number)
+                column_numbers.sort(reverse=True)
+                for j in range(0,rows):
+                    number = ticket[j][i]
+                    if type(number) == type(91) and number != 0:
+                        ticket[j][i] = column_numbers.pop()
             print("Ticket Generated Successfully")
     return ticket
 

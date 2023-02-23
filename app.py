@@ -1,5 +1,6 @@
 import random
 import json
+import operator
 
 with open('questions.json', 'r') as file:
     questions = json.load(file)
@@ -12,12 +13,14 @@ columns = 9
 
 numbers_per_ticket = required_filled_positions - questions_per_ticket
 tickets = []
-
+number_of_non_filled_positions_in_a_row = columns - (required_filled_positions/3)
 
 def generate_ticket(all_questions):
     non_zero_ticket = False
-    while non_zero_ticket == False:
+    five_in_a_row = False
+    while non_zero_ticket == False or five_in_a_row == False:
         non_zero_ticket = True
+        five_in_a_row = True
         ticket = [[0 for i in range(columns)] for j in range(rows)]
         count = 0
         questions = set(all_questions)
@@ -46,6 +49,13 @@ def generate_ticket(all_questions):
                 if non_zero == False:
                     print(f"ticket had a column with all zeroes. Recreating the ticket\n{ticket}\n")
                     non_zero_ticket = False
+        if count == required_filled_positions:
+            for row in ticket:
+                if operator.countOf(row, 0) != number_of_non_filled_positions_in_a_row:
+                    print(f"ticket had a row with more or less number of filled postions than expected. Recreating the ticket\n{ticket}\n")
+                    five_in_a_row = False
+        if non_zero_ticket == True and five_in_a_row == True:
+            print("Ticket Generated Successfully")
     return ticket
 
 

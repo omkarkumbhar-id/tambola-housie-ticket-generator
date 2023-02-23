@@ -14,26 +14,38 @@ numbers_per_ticket = required_filled_positions - questions_per_ticket
 tickets = []
 
 
-def generate_ticket(questions):
-    ticket = [[0 for i in range(columns)] for j in range(rows)]
-    count = 0
-    questions = set(questions)
-    numbers = set()
-    while count < required_filled_positions:
-        row = random.randint(0, rows-1)
-        col = random.randint(0, columns-1)
-        if ticket[row][col] == 0:
-            if count < numbers_per_ticket:
-                number = random.randint(col * 10 + 1, (col + 1) * 10)
-                if number not in numbers:
-                    ticket[row][col] = number
-                    numbers.add(number)
+def generate_ticket(all_questions):
+    non_zero_ticket = False
+    while non_zero_ticket == False:
+        non_zero_ticket = True
+        ticket = [[0 for i in range(columns)] for j in range(rows)]
+        count = 0
+        questions = set(all_questions)
+        numbers = set()
+        while count < required_filled_positions:
+            row = random.randint(0, rows-1)
+            col = random.randint(0, columns-1)
+            if ticket[row][col] == 0:
+                if count < numbers_per_ticket:
+                    number = random.randint(col * 10 + 1, (col + 1) * 10)
+                    if number not in numbers:
+                        ticket[row][col] = number
+                        numbers.add(number)
+                        count += 1
+                else:
+                    question = random.choice(list(questions))
+                    ticket[row][col] = question
+                    questions.remove(question)
                     count += 1
-            else:
-                question = random.choice(list(questions))
-                ticket[row][col] = question
-                questions.remove(question)
-                count += 1
+        if count == required_filled_positions:
+            for i in range(0, columns):
+                non_zero = False
+                for j in range(0, rows):
+                    if ticket[j][i] != 0:
+                        non_zero = True
+                if non_zero == False:
+                    print(f"ticket had a column with all zeroes. Recreating the ticket\n{ticket}\n")
+                    non_zero_ticket = False
     return ticket
 
 
@@ -44,14 +56,15 @@ def generate_tickets(q, n):
 
         for i in range(n):
             tickets.append(generate_ticket(q))
-        
-        unique_list = list(set(tuple(tuple(sub_sub_list) for sub_sub_list in sub_list) for sub_list in tickets))
+
+        unique_list = list(set(tuple(tuple(sub_sub_list)
+                           for sub_sub_list in sub_list) for sub_list in tickets))
         if len(unique_list) == n:
             all_unique_tickets = True
 
     print(f"Successfully generated {len(unique_list)} unique tickets")
-    
-    with open("tickets.json","w") as file:
+
+    with open("tickets.json", "w") as file:
         json.dump(tickets, file)
 
 
